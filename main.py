@@ -14,7 +14,7 @@ import botocore.exceptions
 import requests
 
 MAILGUN = 'https://api.mailgun.net/v3'
-AWS_DEFAULT_REGION=boto3.Session().region_name or 'us-east-1'
+AWS_DEFAULT_REGION = boto3.Session().region_name or 'us-east-1'
 DEFAULT_TF_REMOTE_CONFIG_BUCKET = 'terraform-state-{domain}'
 DEFAULT_TF_REMOTE_CONFIG_KEY = 'terraform.tfstate'
 
