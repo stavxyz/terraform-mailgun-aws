@@ -34,7 +34,7 @@ The included script can help you configure your remote state, once your bucket i
 
 ```
 # this will perform a dry-run, showing you the command
-./main.py tf-remote-config YOUR-DOMAIN.COM --dry-run
+./main.py tf-remote-config <your-domain.com> --dry-run
 ```
 
 Run the same, but without `--dry-run` to configure terraform to use remote state.
