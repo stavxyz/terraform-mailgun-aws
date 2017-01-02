@@ -10,7 +10,7 @@ https://documentation.mailgun.com/quickstart-sending.html#send-with-smtp-or-api
 
 #### mailgun
 
-You'll need your Mailgun API Key which is located in your control panel homepage. 
+You'll need your Mailgun API Key, found in your control panel homepage. 
 
 Sign up: https://mailgun.com/signup
 Control Panel: https://mailgun.com/cp
