@@ -10,12 +10,13 @@ import subprocess
 import sys
 
 import boto3
+import botocore.exceptions
 import requests
 
 MAILGUN = 'https://api.mailgun.net/v3'
-AWS_DEFAULT_REGION = 'us-east-1'
-TERRAFORM_REMOTE_CONFIG_BUCKET = 'terraform-state-{domain}'
-TERRAFORM_REMOTE_CONFIG_KEY = 'terraform.tfstate'
+AWS_DEFAULT_REGION=boto3.Session().region_name or 'us-east-1'
+DEFAULT_TF_REMOTE_CONFIG_BUCKET = 'terraform-state-{domain}'
+DEFAULT_TF_REMOTE_CONFIG_KEY = 'terraform.tfstate'
 
 
 def _mailgun_session(user, key):
@@ -141,19 +142,39 @@ def _tfvars(args):
             json.dump(tfv, tfvars_file, sort_keys=True, indent=2)
 
 
-def _check_tf_config_bucket(domain):
-    s3_service_resource = boto3.resource('s3')
-    bucket = s3_service_resource.create_bucket(
-        Bucket=TERRAFORM_REMOTE_CONFIG_BUCKET.format(domain=domain),
-    )
-    bucket.wait_until_exists()
+def _check_tf_config_bucket(bucket_name):
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.head_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as err:
+        # 403 -> you can not haz, let this re-raise
+        # 404 -> bucket doesn't exist
+        if '404' in str(err):
+            print('Creating bucket: {0}'.format(bucket_name), file=sys.stderr)
+            bucket = boto3.resource('s3').create_bucket(Bucket=bucket_name)
+            bucket.wait_until_exists()
+        else:
+            raise
+    else:
+        bucket = boto3.resource('s3').Bucket(bucket_name)
+
+    bucket_vers = bucket.Versioning()
+    # Let this throw an error if we aren't the owner.
+    if bucket_vers.status != 'Enabled':
+        print('Enabled bucket versioning for {0}'.format(
+            bucket_name), file=sys.stderr)
+        bucket_vers.enable()
 
 
 def _tf_remote_config(args):
-    _check_tf_config_bucket(args.domain)
+    # format remote config bucket value
+    args.tf_remote_config_bucket = args.tf_remote_config_bucket.format(
+        domain=args.domain.lower().replace('.', '-dot-'))
+    if not args.dry_run:
+        _check_tf_config_bucket(args.tf_remote_config_bucket)
     command = [
         'terraform', 'remote', 'config',
-        '-state="{0}"'.format(TERRAFORM_REMOTE_CONFIG_KEY),
+        '-state="{0}"'.format(args.tf_remote_config_key),
         # This doesn't seem to have an effect-- commenting out.
         # '-backup="{0}.backup"'.format(
         #     os.path.join(
@@ -163,9 +184,9 @@ def _tf_remote_config(args):
         # ),
         '-backend="S3"',
         '-backend-config="bucket={0}"'.format(
-            TERRAFORM_REMOTE_CONFIG_BUCKET.format(domain=args.domain)
+            args.tf_remote_config_bucket
         ),
-        '-backend-config="key={0}"'.format(TERRAFORM_REMOTE_CONFIG_KEY),
+        '-backend-config="key={0}"'.format(args.tf_remote_config_key),
         '-backend-config="region={0}"'.format(args.aws_region),
         '-backend-config="encrypt=1"',
     ]
@@ -273,6 +294,8 @@ if __name__ == '__main__':
         # Setting this to 1 so that explicit recipient routes
         # can be added and triggered.
         default=1,
+        help=('Rule priority, where 0 (zero) is highest priority'
+              '(default: %(default)s)'),
     )
     create_route.add_argument(
         '--with-stop', '-s',
@@ -294,7 +317,7 @@ if __name__ == '__main__':
     tfvars = subparsers.add_parser(
         'tfvars',
         help=('Produce tfvars for infra setup and write them '
-              'to terraform.tfvars.json (unless --print is used) '
+              '(unless --print is used) to terraform.tfvars.json '
               'which is picked up by terraform automatically.')
     )
     _mailgun_args(tfvars)
@@ -320,10 +343,17 @@ if __name__ == '__main__':
     tf_remote_config = subparsers.add_parser(
         'tf-remote-config',
         help=('Configure the use of remote state '
-              'storage in AWS S3 for terraform. This '
-              'includes creating the bucket if necessary.'),
+              'storage in AWS S3 for terraform. This command '
+              'also creates the S3 Bucket (if necessary) and ensures '
+              'S3 Bucket versioning is enabled.'),
     )
     tf_remote_config.set_defaults(_func=_tf_remote_config)
+    tf_remote_config.add_argument(
+        'domain',
+        help=('The domain is used to build the S3 bucket name. '
+              'e.g. FOO.com results in a bucket named '
+              'terraform-state-foo-dot-com.')
+    )
     tf_remote_config.add_argument(
         '--dry-run', '-d',
         action='store_true',
@@ -332,18 +362,24 @@ if __name__ == '__main__':
               "just show me the command.")
     )
     tf_remote_config.add_argument(
-        'domain',
-        type=lambda _x: _x.lower().replace('.', '-dot-'),
-        help=('The domain is used to build the S3 bucket name. '
-              'e.g. FOO.com results in a bucket named '
-              'terraform-state-foo-dot-com.')
+        '--tf-remote-config-bucket',
+        default=DEFAULT_TF_REMOTE_CONFIG_BUCKET,
+        help=('S3 bucket to use for terraform remote state'
+              '(default: %(default)s)'),
+    )
+    tf_remote_config.add_argument(
+        '--tf-remote-config-key',
+        default=DEFAULT_TF_REMOTE_CONFIG_KEY,
+        help=('S3 key to use for terraform remote state file'
+              '(default: %(default)s)'),
     )
     tf_remote_config.add_argument(
         '--aws-region', '-r',
-        default=boto3.Session().region_name or AWS_DEFAULT_REGION,
+        default=AWS_DEFAULT_REGION,
         help=('AWS Region for terraform S3 backend. '
               'The standard aws/boto machinery will look this up in your '
-              'environment, else defaults to {0}'.format(AWS_DEFAULT_REGION))
+              'environment, else falls back to us-east-1. '
+              '(default: %(default)s)'),
     )
 
     try:
