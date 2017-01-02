@@ -5,7 +5,17 @@ This project automates the following setup, on AWS Route 53:
 
 https://documentation.mailgun.com/quickstart-sending.html#send-with-smtp-or-api
 
-### get terraform
+
+### Prerequisites
+
+#### mailgun
+
+You'll need your Mailgun API Key which is located in your control panel homepage. 
+
+Sign up: https://mailgun.com/signup
+Control Panel: https://mailgun.com/cp
+
+#### terraform
 
 https://www.terraform.io/downloads.html
 
