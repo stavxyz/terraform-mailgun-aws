@@ -12,7 +12,7 @@ https://documentation.mailgun.com/quickstart-sending.html#send-with-smtp-or-api
 
 You'll need your Mailgun API Key, found in your control panel homepage. 
 
-Sign up: https://mailgun.com/signup
+Sign up: https://mailgun.com/signup  
 Control Panel: https://mailgun.com/cp
 
 #### terraform
