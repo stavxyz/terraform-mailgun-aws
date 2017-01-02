@@ -47,6 +47,25 @@ so run the tfvars command and it will be written for you:
 ./main.py tfvars foo.com
 ```
 
+Mailgun domains do not support `terraform import`, so you need to let this module
+create the mailgun domain for you, otherwise you end up manually editing your
+state file which probably won't end well.
+
+### module usage
+
+Utilize this module in one or more of your tf files:
+
+```hcl
+module "mailer" {
+  source                = "github.com/samstav/tf_mailgun_aws"
+  domain                = "${var.domain}"
+  mailgun_smtp_password = "${var.mailgun_smtp_password}"
+}
+```
+
+Before running your plan, fetch the module with `terraform get`
+
+
 ### Using an existing route53 zone for your domain
 
 To use an existing zone, instead of letting this tf module create the zone,
