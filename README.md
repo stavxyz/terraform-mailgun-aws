@@ -35,9 +35,9 @@ $ terraform apply remote-config.plan
 Otherwise, if you want to use an existing s3 bucket to store your terraform state:
 
 ```
-# instead of the foo-dot-com suffix, if your domain
-# is johnsmith.net use terraform-state-johnsmith-dot-net
-$ terraform import aws_s3_bucket.bucket terraform-state-foo-dot-com
+# if your domain is johnsmith.net, use terraform-state-johnsmith-dot-net
+# i.e. replace '.' with '-dot-'
+$ terraform import aws_s3_bucket.bucket terraform-state-johnsmith-dot-net
 ```
 
 The included script can help you configure your remote state, once your bucket is created.
@@ -47,14 +47,14 @@ The included script can help you configure your remote state, once your bucket i
 ./main.py tf-remote-config <your-domain.com> --dry-run
 ```
 
-Run the same, but without `--dry-run` to configure terraform to use remote state.
+Run the same, but without `--dry-run`, to configure terraform to use remote state.
 
 Terraform autoloads `terraform.tfvars.json` variable files as well,
 as of https://github.com/hashicorp/terraform/pull/1093
 so run the tfvars command and it will be written for you:
 
 ```
-./main.py tfvars foo.com
+./main.py tfvars your-domain.com
 ```
 
 Mailgun domains do not support `terraform import`, so you need to let this module
@@ -91,6 +91,12 @@ where INSTANCE is the name you choose as in
 module "INSTANCE" {
 source = "github.com/samstav/tf_mailgun_aws"
 }
+```
+
+To find the zone id for your existing Route53 Hosted Zone:
+
+```
+$ aws route53 list-hosted-zones-by-name --dns-name your-domain.com
 ```
 
 Then
