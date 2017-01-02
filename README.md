@@ -13,7 +13,7 @@ or mac users can `brew install terraform`
 
 ### A note on terraform state
 
-I prefer using [s3 remote state for terraform](https://www.terraform.io/docs/state/remote/s3.html) instead of leaving state on your local machine. In addition to being able to make infra changes via CI (e.g. CircleCI), this has the added benefit of easy tf state rollbacks via S3 bucket versioning.
+I prefer using [s3 remote state for terraform](https://www.terraform.io/docs/state/remote/s3.html) instead of leaving state on the local machine. In addition to being able to make infra changes via CI (e.g. CircleCI), this has the added benefit of easy tf state rollbacks via S3 bucket versioning.
 
 Bootstrap your remote state bucket (by creating it, targeted using the `-target` option):
 
