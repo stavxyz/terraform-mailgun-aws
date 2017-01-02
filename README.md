@@ -30,6 +30,15 @@ Otherwise, if you want to use an existing s3 bucket to store your terraform stat
 $ terraform import aws_s3_bucket.bucket terraform-state-foo-dot-com
 ```
 
+The included script can help you configure your remote state, once your bucket is created.
+
+```
+# this will perform a dry-run, showing you the command
+./main.py tf-remote-config --dry-run
+```
+
+Run the same, without `--dry-run` to configure terraform to use remote state.
+
 Terraform autoloads `terraform.tfvars.json` variable files as well,
 as of https://github.com/hashicorp/terraform/pull/1093
 so run the tfvars command and it will be written for you:
