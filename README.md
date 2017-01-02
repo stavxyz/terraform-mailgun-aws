@@ -9,7 +9,7 @@ https://documentation.mailgun.com/quickstart-sending.html#send-with-smtp-or-api
 
 I prefer using [s3 remote state for terraform](https://www.terraform.io/docs/state/remote/s3.html) instead of leaving state on your local machine. In addition to being able to make infra changes via CI (e.g. CircleCI), this has the added benefit of easy tf state rollbacks via S3 bucket versioning.
 
-Bootsrap your remote state bucket like so:
+Bootstrap your remote state bucket (by creating it, targeted using the `-target` option):
 
 ```
 $ terraform plan -out=remote-config.plan -target=aws_s3_bucket.tf_remote_config_bucket
