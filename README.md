@@ -23,7 +23,7 @@ or mac users can `brew install terraform`
 
 The included script can help you configure your remote state.
 
-```
+```bash
 # this will perform a dry-run, showing you the command
 ./main.py tf-remote-config <your-domain.com> --dry-run
 ```
@@ -58,7 +58,7 @@ module "mailer" {
 To use an existing zone, instead of letting this tf module create the zone,
 you need to import your zone (by id) *into the mailgun-aws tf module*:
 
-```
+```bash
 $ terraform import module.INSTANCE.aws_route53_zone.this <your_route53_zone_id>
 ```
 
@@ -72,15 +72,15 @@ module "INSTANCE" {
 
 To find the zone id for your existing Route53 Hosted Zone:
 
-```
+```bash
 $ aws route53 list-hosted-zones-by-name --dns-name your-domain.com
 ```
 
 Then
 
-```
-terraform plan -out=my.plan
-terraform apply my.plan
+```bash
+$ terraform plan -out=my.plan
+$ terraform apply my.plan
 ```
 
 # Nameservers
