@@ -83,6 +83,6 @@ $ terraform plan -out=my.plan
 $ terraform apply my.plan
 ```
 
-# Nameservers
+### Nameservers
 
 Make sure the nameservers (the values on your NS record in your zone) match the nameservers configured at your registrar.
