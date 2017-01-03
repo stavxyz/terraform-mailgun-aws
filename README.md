@@ -26,8 +26,10 @@ or mac users can `brew install terraform`
 The included script can help you configure your [terraform remote state](https://www.terraform.io/docs/state/remote/).
 
 ```bash
-# this will perform a dry-run, showing you the command
-./main.py tf-remote-config <your-domain.com> --dry-run
+$ ./main.py tf-remote-config your-domain.com --dry-run
+Would run command:
+
+terraform remote config -state="terraform.tfstate" -backend="S3" -backend-config="bucket=terraform-state-your-domain-dot-com" -backend-config="key=terraform.tfstate" -backend-config="region=us-east-1" -backend-config="encrypt=1"
 ```
 
 Run the same, but without `--dry-run`, to configure terraform to use remote state. This will also create [your s3 bucket](https://www.terraform.io/docs/state/remote/s3.html) if it doesn't already exist.
@@ -52,7 +54,7 @@ module "mailer" {
 }
 ```
 
-*Before running your plan, fetch the module with `terraform get`*
+__*Before running your plan, fetch the module with `terraform get`*__
 
 
 ### Using an existing route53 zone for your domain
