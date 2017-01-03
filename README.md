@@ -95,20 +95,19 @@ $ terraform apply mailer.plan
 
 __*Before running your plan, [fetch the module with `terraform get`](https://www.terraform.io/docs/commands/get.html)*__
 
-
-### Using an existing route53 zone for your domain
+### When using an _existing_ Route53 Zone
 
 To use an existing zone, instead of letting this tf module create the zone,
-you need to import your zone (by id) *into the mailgun-aws tf module*:
+you need to import your [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `tf_mailgun_aws` module* [using `terraform import`](https://www.terraform.io/docs/import/):
 
 ```bash
-$ terraform import module.INSTANCE.aws_route53_zone.this <your_route53_zone_id>
+$ terraform import module.INSTANCE_NAME.aws_route53_zone.this <your_route53_zone_id>
 ```
 
 where INSTANCE is the name you choose as in
 
 ```hcl
-module "INSTANCE" {
+module "INSTANCE_NAME" {
   source = "github.com/samstav/tf_mailgun_aws"
 }
 ```
@@ -117,6 +116,28 @@ To find the zone id for your existing Route53 Hosted Zone:
 
 ```bash
 $ aws route53 list-hosted-zones-by-name --dns-name big-foo.com
+```
+
+### To refer to the Route53 zone created/used by the module
+
+[This module outputs](https://github.com/samstav/tf_mailgun_aws/blob/master/outputs.tf) the Route53 Zone ID, as well as the NS record values (the nameservers):
+
+To refer to these outputs, use `"${module.INSTANCE_NAME.zone_id}"` or `"${module.INSTANCE_NAME.name_servers}"`
+
+```hcl
+
+...
+
+resource "aws_route53_record" "root" {
+  zone_id = "${module.INSTANCE_NAME.zone_id}"
+  name = "${var.domain}"
+  type = "A"
+  alias {
+    name = "s3-website-us-east-1.amazonaws.com."
+    zone_id = "********"
+    evaluate_target_health = true
+  }
+}
 ```
 
 ### Adding a route in mailgun to forward all mail
