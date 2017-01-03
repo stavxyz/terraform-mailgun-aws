@@ -1,0 +1,11 @@
+dependencies:
+  cache_directories:
+    - "~/tf"
+  override:
+    - wget -N -O ~/tf/terraform.zip https://releases.hashicorp.com/terraform/0.8.2/terraform_0.8.2_linux_amd64.zip
+    - unzip -d "${HOME}/bin" ~/tf/terraform.zip
+    - terraform version
+
+test:
+  override:
+    - terraform validate
