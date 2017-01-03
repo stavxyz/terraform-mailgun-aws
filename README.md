@@ -66,7 +66,7 @@ where INSTANCE is the name you choose as in
 
 ```hcl
 module "INSTANCE" {
-source = "github.com/samstav/tf_mailgun_aws"
+  source = "github.com/samstav/tf_mailgun_aws"
 }
 ```
 
