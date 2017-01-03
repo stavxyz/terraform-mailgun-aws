@@ -7,6 +7,22 @@ This project automates the following setup, on AWS Route 53:
 
 https://documentation.mailgun.com/quickstart-sending.html#verify-your-domain
 
+Sending & Tracking DNS Records created by this module:  
+
+| Type | Value | Purpose |
+| --- | --- | ---|
+| TXT | “v=spf1 include:mailgun.org ~all” | SPF (Required) |
+| TXT | [_This value is dynamic_](https://documentation.mailgun.com/quickstart-sending.html#add-sending-tracking-dns-records)| DKIM (Required) |
+| CNAME | “mailgun.org” | Tracking (Optional) |
+
+Receiving MX Records Records created by this module:  
+
+| Type | Value | Purpose |
+| --- | --- | ---|
+| MX | mxa.mailgun.org | Receiving (Optional) |
+| MX | mxb.mailgun.org	| Receiving (Optional) |
+
+There is an [open issue](https://github.com/samstav/tf_mailgun_aws/issues/1) to make these receiving records optional for this module. 
 
 ### Prerequisites
 
