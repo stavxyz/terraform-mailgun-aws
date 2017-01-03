@@ -1,4 +1,6 @@
-# tf_mailgun_aws
+# tf_mailgun_aws  
+[![Circle CI](https://circleci.com/gh/samstav/tf_mailgun_aws/tree/master.svg?style=shield)](https://circleci.com/gh/samstav/tf_mailgun_aws)
+
 A Terraform module for creating a Mailgun domain, Route53 Zone, and corresponding DNS records
 
 This project automates the following setup, on AWS Route 53:
