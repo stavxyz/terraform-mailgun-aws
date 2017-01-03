@@ -23,14 +23,14 @@ https://www.terraform.io/downloads.html
 
 or mac users can `brew install terraform`
 
-The included script can help you configure your remote state.
+The included script can help you configure your [terraform remote state](https://www.terraform.io/docs/state/remote/).
 
 ```bash
 # this will perform a dry-run, showing you the command
 ./main.py tf-remote-config <your-domain.com> --dry-run
 ```
 
-Run the same, but without `--dry-run`, to configure terraform to use remote state. This will also create your s3 bucket if it doesn't already exist.
+Run the same, but without `--dry-run`, to configure terraform to use remote state. This will also create [your s3 bucket](https://www.terraform.io/docs/state/remote/s3.html) if it doesn't already exist.
 
 Mailgun domains do not support `terraform import`, so you need to let this module
 create the mailgun domain for you, otherwise you end up manually editing your
