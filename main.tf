@@ -34,7 +34,8 @@ resource "mailgun_domain" "this" {
 }
 
 resource "aws_route53_zone" "this" {
-  name          = "${var.domain}"
+  # This hack deals with https://github.com/hashicorp/terraform/issues/8511
+  name = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
   comment       = "Domain with mailgun mail managed by terraform."
   force_destroy = false
 }
