@@ -67,6 +67,10 @@ resource "aws_route53_record" "mailgun_sending_record_2" {
 }
 
 resource "aws_route53_record" "mailgun_receiving_records_mx" {
+  # Some users may have another provider handling inbound
+  # mail and just want their domain verified and setup for outbound
+  # Use the count trick to make this optional.
+  count = "${var.mailgun_set_mx_for_inbound ? 1 : 0}"
   zone_id = "${aws_route53_zone.this.zone_id}"
   name = ""
   ttl     = "${var.record_ttl}"
