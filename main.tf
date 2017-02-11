@@ -21,18 +21,30 @@
  *
  */
 
+
+# This module uses conditionals and therefore needs at least 0.8.0
+# https://github.com/hashicorp/terraform/blob/master/CHANGELOG.md#080-december-13-2016
+
+terraform {
+  required_version = ">= 0.8.0"
+}
+
+
 resource "mailgun_domain" "this" {
   name          = "${var.domain}"
   smtp_password = "${var.mailgun_smtp_password}"
   spam_action   = "${var.mailgun_spam_action}"
   wildcard      = "${var.mailgun_wildcard}"
 
-  # prevent_destroy is on because I have had issues
+  # prevent_destroy is on because I have seen issues
   # with mailgun disabling my domain resource when
-  # terraform re-creates it
+  # terraform re-creates it. This results in needing
+  # to open a ticket with mailgun and is no fun :)
+
   lifecycle {
     prevent_destroy = true
   }
+
 }
 
 resource "aws_route53_zone" "this" {
@@ -40,6 +52,9 @@ resource "aws_route53_zone" "this" {
   name = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
   comment       = "Domain with mailgun mail managed by terraform."
   force_destroy = false
+  tags {
+    comment = "Managed by terraform and created by samstav/tf_mailgun_aws"
+  }
 }
 
 resource "aws_route53_record" "mailgun_sending_record_0" {
