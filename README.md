@@ -68,8 +68,8 @@ Utilize this module in one or more of your tf files:
 ### variables file, `terraform.tfvars`  
 
 ```bash
-domain = "big-foo.com"
 aws_region = "us-east-1"
+domain = "big-foo.com"
 mailgun_api_key = "key-***********"
 mailgun_smtp_password = "*********"
 ```
@@ -77,30 +77,52 @@ mailgun_smtp_password = "*********"
 ### terraform file, e.g. `main.tf`  
 
 ```hcl
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
 provider "mailgun" {
   api_key = "${var.mailgun_api_key}"
 }
 
-provider "aws" {
-  region = "${var.aws_region}"
-}
+variable "aws_region" {}
+variable "domain" {}
+variable "mailgun_api_key" {}
+variable "mailgun_smtp_password" {}
 
 module "mailer" {
   source                = "github.com/samstav/tf_mailgun_aws"
   domain                = "${var.domain}"
   mailgun_smtp_password = "${var.mailgun_smtp_password}"
 }
-```
 
-Then
-
-```
-$ terraform get -update=true
-$ terraform plan -out=mailer.plan
-$ terraform apply mailer.plan
 ```
 
 __*Before running your plan, [fetch the module with `terraform get`](https://www.terraform.io/docs/commands/get.html)*__
+
+
+Once your definition(s) are complete:
+
+```bash
+# This downloads and installs modules needed for your configuration.
+# See `terraform get --help` for more info
+$ terraform get -update=true
+# This generates an execution plan for terraform. To save this to a file you need to supply -out.
+# See `terraform plan --help` for more info.
+$ terraform plan -out=mailer.plan
+# This builds or changes infrastructure according to the terraform execution plan.
+# See `terraform apply --help` for more info. 
+$ terraform apply mailer.plan
+```
+
+To [pin your configuration to a specific version of this module, use the `?ref` param](https://www.terraform.io/docs/modules/sources.html#ref) and change your `source` line to something like this:
+
+```hcl
+  source = "github.com/samstav/tf_mailgun_aws?ref=v1.1.0"
+```
+
+See [releases](https://github.com/samstav/tf_mailgun_aws/releases). 
+
 
 ### When using an _existing_ Route53 Zone
 
