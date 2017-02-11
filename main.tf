@@ -7,13 +7,15 @@
  *   - AWS Route53 Records:
  *     - SPF, DKIM, CNAME, MX
  *
- * If using an existing Route53 Zone, import the zone
- * into terraform:
- * $ terraform import module.INSTANCE.aws_route53_zone.this <your_route53_zone_id>
+ * The MX records are optional, to disable set the variable mailgun_set_mx_for_inbound to false.
  *
- * where INSTANCE is the name you choose as in
+ * If using an existing Route53 Zone, perform a terraform import on your zone:
  *
- * module "INSTANCE" {
+ * $ terraform import module.my_instance.aws_route53_zone.this <your_route53_zone_id>
+ *
+ * where the 'my_instance' portion is the name you choose:
+ *
+ * module "my_instance" {
  *   source = "github.com/samstav/tf_mailgun_aws"
  * }
  *

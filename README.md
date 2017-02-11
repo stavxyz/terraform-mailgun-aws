@@ -104,13 +104,13 @@ To use an existing zone, instead of letting this tf module create the zone,
 you need to import your [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `tf_mailgun_aws` module* [using `terraform import`](https://www.terraform.io/docs/import/):
 
 ```bash
-$ terraform import module.INSTANCE_NAME.aws_route53_zone.this <your_route53_zone_id>
+$ terraform import module.my_instance.aws_route53_zone.this <your_route53_zone_id>
 ```
 
-where INSTANCE is the name you choose as in
+where the `my_instance` portion of this resource is the name you chose:
 
 ```hcl
-module "INSTANCE_NAME" {
+module "my_instance" {
   source = "github.com/samstav/tf_mailgun_aws"
 }
 ```
@@ -125,14 +125,14 @@ $ aws route53 list-hosted-zones-by-name --dns-name big-foo.com
 
 [This module outputs](https://github.com/samstav/tf_mailgun_aws/blob/master/outputs.tf) the Route53 Zone ID, as well as the NS record values (the nameservers):
 
-To refer to these outputs, use `"${module.INSTANCE_NAME.zone_id}"` or `"${module.INSTANCE_NAME.name_servers}"`
+To refer to these outputs, use `"${module.my_instance.zone_id}"` or `"${module.my_instance.name_servers}"`
 
 ```hcl
 
 ...
 
 resource "aws_route53_record" "root" {
-  zone_id = "${module.INSTANCE_NAME.zone_id}"
+  zone_id = "${module.my_instance.zone_id}"
   name = "${var.domain}"
   type = "A"
   alias {
@@ -145,7 +145,7 @@ resource "aws_route53_record" "root" {
 
 ### Adding a route in mailgun to forward all mail
 
-Route resources are not available in the [mailgun terraform provider](https://www.terraform.io/docs/providers/mailgun/), so we do it with the script. 
+Route resources are not available in the [mailgun terraform provider](https://www.terraform.io/docs/providers/mailgun/), so we do it with the script.
 
 ```
 $ ./main.py create-route big-foo.com --forward bigfoo@gmail.com
