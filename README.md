@@ -15,14 +15,18 @@ Sending & Tracking DNS Records created by this module:
 | TXT | [_This value is dynamic_](https://documentation.mailgun.com/quickstart-sending.html#add-sending-tracking-dns-records)| DKIM (Required) |
 | CNAME | “mailgun.org” | Tracking (Optional) |
 
-Receiving MX Records Records created by this module:  
+Receiving MX Records Records created by this module (optional, see use of `mailgun_set_mx_for_inbound` variable below) :  
 
 | Type | Value | Purpose |
 | --- | --- | ---|
 | MX | mxa.mailgun.org | Receiving (Optional) |
 | MX | mxb.mailgun.org	| Receiving (Optional) |
 
-There is an [open issue](https://github.com/samstav/tf_mailgun_aws/issues/1) to make these receiving records optional for this module. 
+From the [mailgun docs](https://documentation.mailgun.com/quickstart-receiving.html#add-receiving-mx-records):
+
+> Do not configure Receiving MX DNS records if you already have another provider handling inbound mail delivery for your domain (e.g. Gmail). Instead we recommend using a subdomain on Mailgun (e.g. mg.yourdomain.com)
+
+To disable the creation of the MX records, set [the terraform variable `mailgun_set_mx_for_inbound`](https://github.com/samstav/tf_mailgun_aws/blob/6c58d8bc8699866337816f3f583c97bb40105423/variables.tf#L20-L23) to `false`. 
 
 ## Prerequisites
 
