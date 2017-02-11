@@ -49,12 +49,9 @@ resource "mailgun_domain" "this" {
 
 resource "aws_route53_zone" "this" {
   # This hack deals with https://github.com/hashicorp/terraform/issues/8511
-  name = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
-  comment       = "Domain with mailgun mail managed by terraform."
+  name          = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
+  comment       = "Zone managed by terraform with mailgun mail and created by github.com/samstav/tf_mailgun_aws"
   force_destroy = false
-  tags {
-    comment = "Managed by terraform and created by samstav/tf_mailgun_aws"
-  }
 }
 
 resource "aws_route53_record" "mailgun_sending_record_0" {
