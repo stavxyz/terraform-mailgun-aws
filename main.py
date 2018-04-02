@@ -226,7 +226,7 @@ if __name__ == '__main__':
         _parser.add_argument(
             '--mailgun-user', '-u',
             help='Defaults to the MAILGUN_USER environment variable.',
-            default=os.getenv('MAILGUN_USER') or None,
+            default=os.getenv('MAILGUN_USER') or 'api'
         )
 
     subparsers = parser.add_subparsers()
