@@ -10,8 +10,8 @@ test:
   override:
     - terraform validate
     - terraform get -update=true:
-        pwd: example
+        pwd: examples/basic-example
     - terraform plan -out=example.plan:
-        pwd: example
+        pwd: examples/basic-example
     - terraform show example.plan:
-        pwd: example
+        pwd: examples/basic-example
