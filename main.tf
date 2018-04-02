@@ -1,5 +1,5 @@
 /*
- * Module: tf_mailgun_aws
+ * Module: terraform-mailgun-aws
  *
  * This template creates the following resources
  *   - A Mailgun domain
@@ -16,7 +16,7 @@
  * where the 'my_instance' portion is the name you choose:
  *
  * module "my_instance" {
- *   source = "github.com/samstav/tf_mailgun_aws"
+ *   source = "github.com/samstav/terraform-mailgun-aws"
  * }
  *
  */
@@ -50,7 +50,7 @@ resource "mailgun_domain" "this" {
 resource "aws_route53_zone" "this" {
   # This hack deals with https://github.com/hashicorp/terraform/issues/8511
   name          = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
-  comment       = "Zone managed by terraform with mailgun mail and created by github.com/samstav/tf_mailgun_aws"
+  comment       = "Zone managed by terraform with mailgun mail and created by github.com/samstav/terraform-mailgun-aws"
   force_destroy = false
 }
 

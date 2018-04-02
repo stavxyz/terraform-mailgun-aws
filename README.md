@@ -1,5 +1,5 @@
-# tf_mailgun_aws  
-[![Circle CI](https://circleci.com/gh/samstav/tf_mailgun_aws/tree/master.svg?style=shield)](https://circleci.com/gh/samstav/tf_mailgun_aws)
+# terraform-mailgun-aws
+[![Circle CI](https://circleci.com/gh/samstav/terraform-mailgun-aws/tree/master.svg?style=shield)](https://circleci.com/gh/samstav/terraform-mailgun-aws)
 [![Terraform](https://img.shields.io/badge/terraform-%3E=0.8.0-822ff7.svg)](https://www.terraform.io/)
 
 A Terraform module for creating a Mailgun domain, Route53 Zone, and corresponding DNS records
@@ -27,7 +27,7 @@ From the [mailgun docs](https://documentation.mailgun.com/quickstart-receiving.h
 
 > Do not configure Receiving MX DNS records if you already have another provider handling inbound mail delivery for your domain (e.g. Gmail). Instead we recommend using a subdomain on Mailgun (e.g. mg.yourdomain.com)
 
-To disable the creation of the MX records, set [the terraform variable `mailgun_set_mx_for_inbound`](https://github.com/samstav/tf_mailgun_aws/blob/6c58d8bc8699866337816f3f583c97bb40105423/variables.tf#L20-L23) to `false`. 
+To disable the creation of the MX records, set [the terraform variable `mailgun_set_mx_for_inbound`](https://github.com/samstav/terraform-mailgun-aws/blob/6c58d8bc8699866337816f3f583c97bb40105423/variables.tf#L20-L23) to `false`. 
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ variable "mailgun_api_key" {}
 variable "mailgun_smtp_password" {}
 
 module "mailer" {
-  source                = "github.com/samstav/tf_mailgun_aws"
+  source                = "github.com/samstav/terraform-mailgun-aws"
   domain                = "${var.domain}"
   mailgun_smtp_password = "${var.mailgun_smtp_password}"
 }
@@ -119,16 +119,16 @@ $ terraform apply mailer.plan
 To [pin your configuration to a specific version of this module, use the `?ref` param](https://www.terraform.io/docs/modules/sources.html#ref) and change your `source` line to something like this:
 
 ```hcl
-  source = "github.com/samstav/tf_mailgun_aws?ref=v1.1.0"
+  source = "github.com/samstav/terraform-mailgun-aws?ref=v1.1.0"
 ```
 
-See [releases](https://github.com/samstav/tf_mailgun_aws/releases). 
+See [releases](https://github.com/samstav/terraform-mailgun-aws/releases). 
 
 
 ### When using an _existing_ Route53 Zone
 
 To use an existing zone, instead of letting this tf module create the zone,
-you need to import your [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `tf_mailgun_aws` module* [using `terraform import`](https://www.terraform.io/docs/import/):
+you need to import your [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `terraform-mailgun-aws` module* [using `terraform import`](https://www.terraform.io/docs/import/):
 
 ```bash
 $ terraform import module.my_instance.aws_route53_zone.this <your_route53_zone_id>
@@ -138,7 +138,7 @@ where the `my_instance` portion of this resource is the name you chose:
 
 ```hcl
 module "my_instance" {
-  source = "github.com/samstav/tf_mailgun_aws"
+  source = "github.com/samstav/terraform-mailgun-aws"
 }
 ```
 
@@ -150,7 +150,7 @@ $ aws route53 list-hosted-zones-by-name --dns-name big-foo.com
 
 ### To refer to the Route53 zone created/used by the module
 
-[This module outputs](https://github.com/samstav/tf_mailgun_aws/blob/master/outputs.tf) the Route53 Zone ID, as well as the NS record values (the nameservers):
+[This module outputs](https://github.com/samstav/terraform-mailgun-aws/blob/master/outputs.tf) the Route53 Zone ID, as well as the NS record values (the nameservers):
 
 To refer to these outputs, use `"${module.my_instance.zone_id}"` or `"${module.my_instance.name_servers}"`
 
