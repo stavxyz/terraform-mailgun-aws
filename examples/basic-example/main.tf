@@ -12,7 +12,7 @@ variable "mailgun_api_key" {}
 variable "mailgun_smtp_password" {}
 
 module "mailer" {
-  source                = "../"
+  source                = "../../"
   domain                = "${var.domain}"
   mailgun_smtp_password = "${var.mailgun_smtp_password}"
 }
