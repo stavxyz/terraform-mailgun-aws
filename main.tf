@@ -47,6 +47,10 @@ resource "mailgun_domain" "this" {
 
 }
 
+data "aws_route53_zone" "selected" {
+  zone_id = "${var.zone_id == "0" ? "${element(concat(aws_route53_zone.this.*.zone_id, list("")), 0) }" : var.zone_id}"
+}
+
 resource "aws_route53_zone" "this" {
   # If zone_id is its default (0) then dont create a zone
   count = "${var.zone_id == "0" ? 1 : 0}"
@@ -57,15 +61,16 @@ resource "aws_route53_zone" "this" {
 }
 
 resource "aws_route53_record" "mailgun_sending_record_0" {
-  zone_id = "${aws_route53_zone.this.zone_id}"
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "${mailgun_domain.this.sending_records.0.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.0.record_type}"
   records = ["${mailgun_domain.this.sending_records.0.value}"]
 }
 
+
 resource "aws_route53_record" "mailgun_sending_record_1" {
-  zone_id = "${aws_route53_zone.this.zone_id}"
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "${mailgun_domain.this.sending_records.1.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.1.record_type}"
@@ -73,7 +78,7 @@ resource "aws_route53_record" "mailgun_sending_record_1" {
 }
 
 resource "aws_route53_record" "mailgun_sending_record_2" {
-  zone_id = "${aws_route53_zone.this.zone_id}"
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "${mailgun_domain.this.sending_records.2.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.2.record_type}"
@@ -85,7 +90,7 @@ resource "aws_route53_record" "mailgun_receiving_records_mx" {
   # mail and just want their domain verified and setup for outbound
   # Use the count trick to make this optional.
   count = "${var.mailgun_set_mx_for_inbound ? 1 : 0}"
-  zone_id = "${aws_route53_zone.this.zone_id}"
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name = ""
   ttl     = "${var.record_ttl}"
   type = "MX"
