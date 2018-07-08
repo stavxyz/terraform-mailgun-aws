@@ -70,11 +70,13 @@ resource "mailgun_domain" "this" {
 }
 
 data "aws_route53_zone" "selected" {
+  # if this module created/manages the zone, then refer to its zone_id, otherwise
+  # refer to the zone_id passed into this module
   zone_id = "${var.zone_id == "0" ? "${element(concat(aws_route53_zone.this.*.zone_id, list("")), 0) }" : var.zone_id}"
 }
 
 resource "aws_route53_zone" "this" {
-  # If zone_id is its default (0) then dont create a zone
+  # If zone_id is its default (0) then create a new zone, else, use zone_id passed in
   count = "${var.zone_id == "0" ? 1 : 0}"
   # This hack deals with https://github.com/hashicorp/terraform/issues/8511
   name          = "${element( split("","${var.domain}"), "${ length("${var.domain}") -1 }") == "." ? var.domain : "${var.domain}."}"
