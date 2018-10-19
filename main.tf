@@ -16,7 +16,7 @@
  *
  * $ terraform import module.mailer.aws_route53_zone.this[0] <your_route53_zone_id>
  *
- * (The `[0]` is needed becauser it is a "conditional resource" and you must refer to the 'count'
+ * (The `[0]` is needed because it is a "conditional resource" and you must refer to the 'count'
  *  index when importing, which is always [0])
  *
  * where the 'mailer' portion is the name you choose:

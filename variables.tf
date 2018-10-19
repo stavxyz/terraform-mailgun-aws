@@ -24,7 +24,7 @@ variable "mailgun_set_mx_for_inbound" {
 
 variable "zone_id" {
   default = 0
-  description = "You probbaly want to set this variable if 1) You are using an existing Route53 Zone 2) You don't want to delete and recreate that route53 zone and/or 3) You don't want to `terraform import` your existing Route53 Zone into this module. (Instructions for that are in the README). If this zone id is set, terrafrom-mailgun-aws will use this existing zone *instead of creating one for you*."
+  description = "You probaly want to set this variable if 1) You are using an existing Route53 Zone 2) You don't want to delete and recreate that route53 zone and/or 3) You don't want to `terraform import` your existing Route53 Zone into this module. (Instructions for that are in the README). If this zone id is set, terrafrom-mailgun-aws will use this existing zone *instead of creating one for you*."
 }
 
 variable "record_ttl" {
