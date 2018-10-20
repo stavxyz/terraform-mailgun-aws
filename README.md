@@ -4,7 +4,7 @@
 
 A Terraform module for creating a Mailgun domain, Route53 Zone, and corresponding DNS records
 
-This project automates the following setup, on AWS Route 53:
+This project automates the following setup on AWS Route 53:
 
 https://documentation.mailgun.com/quickstart-sending.html#verify-your-domain
 
@@ -115,17 +115,22 @@ See [releases](https://github.com/samstav/terraform-mailgun-aws/releases).
 
 ### When using an _existing_ Route53 Zone
 
-To use an existing zone, instead of letting this tf module create the zone,
-you need to import your [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `terraform-mailgun-aws` module* [using `terraform import`](https://www.terraform.io/docs/import/):
+There are two different approaches when using an existing Route53 Zone with this module. The first, and simplest approach, is to set the `zone_id` variable. This module detects the presence of this value and will presume the existence of your Route53 zone. It will use then use (and modify the records on that zone) rather than creating a new zone for you.
 
-```bash
-$ terraform import module.my_instance.aws_route53_zone.this <your_route53_zone_id>
+The second approach is to import your existing Route53 [zone](https://www.terraform.io/docs/providers/aws/r/route53_zone.html) (by id) *into the `terraform-mailgun-aws` module* [using `terraform import`](https://www.terraform.io/docs/import/). The fundamental difference with this approach is that your zone will now be tracked and managed as a resource component of this module. Every terraform run (plan/apply) will then check the existence and state (configuration) of the zone. This has some advantages, primarily in the case that you want terraform to destroy and/or re-create the zone without needing to hard-code the new Route53 Zone ID.
+
+To import your existing zone into this module:
+
+```
+$ terraform import module.mailer.aws_route53_zone.this[0] <your_route53_zone_id>
 ```
 
-where the `my_instance` portion of this resource is the name you chose:
-
+_(The `[0]` is needed because it is a "conditional resource" and you must refer to the 'count' index when importing, which is always [0])_
+ 
+The `mailer` portion is the name you choose for the module instance, e.g.:
+ 
 ```hcl
-module "my_instance" {
+module "mailer" {
   source = "github.com/samstav/terraform-mailgun-aws"
 }
 ```
@@ -140,14 +145,15 @@ $ aws route53 list-hosted-zones-by-name --dns-name big-foo.com
 
 [This module outputs](https://github.com/samstav/terraform-mailgun-aws/blob/master/outputs.tf) the Route53 Zone ID, as well as the NS record values (the nameservers):
 
-To refer to these outputs, use `"${module.my_instance.zone_id}"` or `"${module.my_instance.name_servers}"`
+To refer to these outputs, use `"${module.mailer.zone_id}"` or `"${module.mailer.name_servers}"`
 
 ```hcl
 
 ...
 
 resource "aws_route53_record" "root" {
-  zone_id = "${module.my_instance.zone_id}"
+  # refer to your zone id like so
+  zone_id = "${module.mailer.zone_id}"
   name = "${var.domain}"
   type = "A"
   alias {
