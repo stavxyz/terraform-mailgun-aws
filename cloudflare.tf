@@ -1,21 +1,3 @@
-
-# attributes: zones, id, name
-data "cloudflare_zones" "selected" {
-  # if this module created/manages the zone, then refer to its Zone ID, otherwise
-  # refer to the Zone (by name) passed into this module
-  # Note: Unlike aws r53, Cloudflare zone data source does not accept zone id as a filter
-  filter {
-    # This is a regular expression, so prepend a ^ and append a $ to match a single zone
-    name = "${var.zone_name == "0" ? "${element(concat(cloudflare_zone.this.*.id, list("")), 0) }" : format("^%s$", var.zone_name)}"
-  }
-  count = "${var.dns_provider == "cloudflare" ? 1 : 0}"
-}
-
-# Will probably have to select like:
-#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}
-#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).id}
-
-
 # TODO: expose configuration of zone
 #  - type (can be "full" or "partial")
 #  - plan ?
@@ -29,16 +11,36 @@ variable "cloudflare_zone_type" {
 }
 
 variable "cloudflare_zone_jump_start" {
-  type = "bool"
-  default = false
+  default = "false"
   description = "Boolean of whether to scan for DNS records on creation. Ignored after zone is created. Default: false."
 }
 
 variable "cloudflare_zone_paused" {
-  type = "bool"
-  default = false
+  default = "false"
   description = "Boolean of whether this zone is paused (traffic bypasses Cloudflare). Default: false."
 }
+
+variable "zone_name" {
+  default = 0
+}
+
+
+
+data "cloudflare_zones" "selected" {
+  # if this module created/manages the zone, then refer to its Zone ID, otherwise
+  # refer to the Zone (by name) passed into this module
+  # Note: Unlike aws r53, Cloudflare zone data source does not accept zone id as a filter
+  count = "${var.dns_provider == "cloudflare" ? 1 : 0}"
+  filter {
+    # This is a regular expression, so prepend a ^ and append a $ to match a single zone
+    name = "${var.zone_name == "0" ? "${element(concat(cloudflare_zone.this.*.id, list("")), 0) }" : format("^%s$", var.zone_name)}"
+  }
+}
+
+# Will probably have to select like:
+#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}
+#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).id}
+
 
 resource "cloudflare_zone" "this" {
   # If zone_name is its default (0) then create a new zone, else, use zone passed in
@@ -51,7 +53,7 @@ resource "cloudflare_zone" "this" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_0" {
-  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0)}.name"
   name    = "${mailgun_domain.this.sending_records.0.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.0.record_type}"
@@ -60,7 +62,7 @@ resource "cloudflare_record" "mailgun_sending_record_0" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_1" {
-  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0)}.name"
   name    = "${mailgun_domain.this.sending_records.1.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.1.record_type}"
@@ -69,7 +71,7 @@ resource "cloudflare_record" "mailgun_sending_record_1" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_2" {
-  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0)}.name"
   name    = "${mailgun_domain.this.sending_records.2.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.2.record_type}"
@@ -81,10 +83,10 @@ resource "cloudflare_record" "mailgun_receiving_records_mx" {
   # Some users may have another provider handling inbound
   # mail and just want their domain verified and setup for outbound
   # Use the count trick to make this optional.
-  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0)}.name"
   name = ""
   ttl     = "${var.record_ttl}"
   type    = "MX"
-  value = format("%s %s", ${mailgun_domain.this.receiving_records.0.priority} ${mailgun_domain.this.receiving_records.0.value}),
+  value = "${format("%s %s", mailgun_domain.this.receiving_records.0.priority, mailgun_domain.this.receiving_records.0.value)}"
   count = "${var.dns_provider == "cloudflare" ? 1 : 0}"
 }

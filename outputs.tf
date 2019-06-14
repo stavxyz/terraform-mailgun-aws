@@ -16,13 +16,13 @@ output "aws_zone_id" {
 }
 
 output "cloudflare_name_servers" {
-  value = "${element(concat(data.cloudflare_zone.selected.*.name_servers, list("")), 0)}"
+  value = "${element(concat(data.cloudflare_zones.selected.*.name_servers, list("")), 0)}"
 }
 
 output "cloudflare_zone_name" {
-  value = "${element(concat(data.cloudflare_zone.selected.*.name, list("")), 0)}"
+  value = "${element(concat(data.cloudflare_zones.selected.*.name, list("")), 0)}"
 }
 
 output "cloudflare_zone_id" {
-  value = "${element(concat(data.cloudflare_zone.selected.*.id, list("")), 0)}"
+  value = "${element(concat(data.cloudflare_zones.selected.*.id, list("")), 0)}"
 }
