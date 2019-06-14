@@ -12,8 +12,9 @@ data "cloudflare_zones" "selected" {
 }
 
 # Will probably have to select like:
-#  -> ${data.cloudflare_zones[0].id}
-#  -> ${data.cloudflare_zones[0].name}
+#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}
+#  -> ${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).id}
+
 
 # TODO: expose configuration of zone
 #  - type (can be "full" or "partial")
@@ -39,7 +40,6 @@ variable "cloudflare_zone_paused" {
   description = "Boolean of whether this zone is paused (traffic bypasses Cloudflare). Default: false."
 }
 
-
 resource "cloudflare_zone" "this" {
   # If zone_name is its default (0) then create a new zone, else, use zone passed in
   count = "${var.dns_provider == "cloudflare" && var.zone_name == "0" ? 1 : 0}"
@@ -51,7 +51,7 @@ resource "cloudflare_zone" "this" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_0" {
-  domain = ${data.cloudflare_zones[0].name}
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
   name    = "${mailgun_domain.this.sending_records.0.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.0.record_type}"
@@ -60,7 +60,7 @@ resource "cloudflare_record" "mailgun_sending_record_0" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_1" {
-  domain = ${data.cloudflare_zones[0].name}
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
   name    = "${mailgun_domain.this.sending_records.1.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.1.record_type}"
@@ -69,7 +69,7 @@ resource "cloudflare_record" "mailgun_sending_record_1" {
 }
 
 resource "cloudflare_record" "mailgun_sending_record_2" {
-  domain = ${data.cloudflare_zones[0].name}
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
   name    = "${mailgun_domain.this.sending_records.2.name}."
   ttl     = "${var.record_ttl}"
   type    = "${mailgun_domain.this.sending_records.2.record_type}"
@@ -81,7 +81,7 @@ resource "cloudflare_record" "mailgun_receiving_records_mx" {
   # Some users may have another provider handling inbound
   # mail and just want their domain verified and setup for outbound
   # Use the count trick to make this optional.
-  domain = ${data.cloudflare_zones[0].name}
+  domain = "${element(concat(data.cloudflare_zones.selected.*.zones[0], list("")), 0).name}"
   name = ""
   ttl     = "${var.record_ttl}"
   type    = "MX"
