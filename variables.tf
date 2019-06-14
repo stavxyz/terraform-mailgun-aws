@@ -31,3 +31,9 @@ variable "record_ttl" {
   default = 300
   description = "Lifespan of DNS records"
 }
+
+variable "dns_provider" {
+  type = "string"
+  default = "aws"
+  description = "Set your DNS provider. Choices: 'aws' (default/for Route53), 'cloudflare' (for Cloudflare DNS)"
+}
