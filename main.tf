@@ -43,7 +43,6 @@
  *
  */
 
-
 # This module uses conditionals and therefore needs at least 0.8.0
 # https://github.com/hashicorp/terraform/blob/master/CHANGELOG.md#080-december-13-2016
 
@@ -51,12 +50,11 @@ terraform {
   required_version = ">= 0.8.0"
 }
 
-
-resource "mailgun_domain" "this" {
-  name          = "${var.domain}"
-  smtp_password = "${var.mailgun_smtp_password}"
-  spam_action   = "${var.mailgun_spam_action}"
-  wildcard      = "${var.mailgun_wildcard}"
+resource "mailgunv3_domain" "this" {
+  name          = var.domain
+  smtp_password = var.mailgun_smtp_password
+  spam_action   = var.mailgun_spam_action
+  wildcard      = var.mailgun_wildcard
 
   # prevent_destroy is on because I have seen issues
   # with mailgun disabling my domain resource when
@@ -66,5 +64,5 @@ resource "mailgun_domain" "this" {
   lifecycle {
     prevent_destroy = true
   }
-
 }
+
