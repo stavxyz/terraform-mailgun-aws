@@ -216,6 +216,7 @@ if __name__ == '__main__':
         '--verbose', '-v',
         action='count',
     )
+    parser.set_defaults(_func=lambda x: print('Try with --help'))
 
     def _mailgun_args(_parser):
         _parser.add_argument(
